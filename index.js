@@ -72,7 +72,7 @@ app.use('/slack/events', slackEvents.expressMiddleware());
 // *** Greeting any user that says "hi" ***
 slackEvents.on('message', (message, body) => {
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
-  if (!message.subtype && message.text.indexOf('hi') >= 0) {
+  if (!message.subtype && message.text.indexOf('clean') >= 0) {
     // Initialize a client
     const slack = getClientByTeamId(body.team_id);
     // Handle initialization failure
@@ -80,7 +80,7 @@ slackEvents.on('message', (message, body) => {
       return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
     }
     // Respond to the message back in the same channel
-    slack.chat.postMessage({ channel: message.channel, text: `Hello <@${message.user}>! :tada:` })
+    slack.chat.postMessage({ channel: message.channel, text: `I am too tired to clean <@${message.user}>! :tired_face:` })
       .catch(console.error);
   }
 });
