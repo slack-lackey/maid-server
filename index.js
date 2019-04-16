@@ -85,20 +85,20 @@ slackEvents.on('message', (message, body) => {
   }
 });
 
-slackEvents.on('file_created', (file, body) => {
+slackEvents.on('file_created', (message, body) => {
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
-  // if (!message.subtype && message.text.indexOf('```') >= 0) {
-  console.log('file-creation:', file);
-  // Initialize a client
-  // const slack = getClientByTeamId(body.team_id);
-  // // Handle initialization failure
-  // if (!slack) {
-  //   return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
-  // }
-  // // Respond to the message back in the same channel
-  // slack.chat.postMessage({ channel: message.channel, text: `hello... i made a file` })
-  //   .catch(console.error);
-  // }
+  if (message.type === 'file_created') {
+    console.log('file successfully created:', message);
+    // Initialize a client
+    const slack = getClientByTeamId(body.team_id);
+    // Handle initialization failure
+    if (!slack) {
+      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+    }
+    // Respond to the message back in the same channel
+    slack.chat.postMessage({ channel: message.channel, text: `I saved your file :file_folder: <@${message.user}>! :tada: :tada:` })
+      .catch(console.error);
+  }
 });
 
 // *** Greeting any user that says "```" ***
