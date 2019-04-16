@@ -74,10 +74,11 @@ app.use('/slack/events', slackEvents.expressMiddleware());
 
 // *** Greeting any user that says "hi" ***
 slackEvents.on('message', (message, body) => {
-  console.log('message received:');
-  console.log('message type:' + message.subtype);
-  console.log('message:' + message.text);
+  // console.log('message received:');
+  // console.log('message type:' + message.subtype);
+  // console.log('message:' + message.text);
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
+  console.log('simpleMessage',message)
   if (!message.subtype && message.text.indexOf('clean') >= 0) {
     // Initialize a client
     const slack = getClientByTeamId(body.team_id);
@@ -89,27 +90,51 @@ slackEvents.on('message', (message, body) => {
     slack.chat.postMessage({ channel: message.channel, text: `I am too tired to clean <@${message.user}>! :tired_face:` })
       .catch(console.error);
   }
-
-  
-
-
 });
+
+
+slackEvents.on('file_created', (message, body) => {
+  // console.log('message received:');
+  // console.log('message type:' + message.subtype);
+  // console.log('message:' + message.text);
+  // Only deal with messages that have no subtype (plain messages) and contain 'hi'
+  console.log('Message',message)
+  if (message.subtype === 'file_shared') {
+    // Initialize a client
+    const slack = getClientByTeamId(body.team_id);
+    // Handle initialization failure
+    if (!slack) {
+      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+    }
+    // Respond to the message back in the same channel
+    slack.chat.postMessage({ channel: message.channel, text: `I am too tired to clean <@${message.user}>! :tired_face:` })
+      .catch(console.error);
+  }
+});
+
+function handle_channel(event, body){
+  let url = 'https://slack.com/api/files.info?file=' + event.file_id +'&token=' + process.env.SLACK_AUTH_TOKEN;
+}
 
 
 function handle_file_event(event, body){
 
-  console.log('event==>:');
-  console.log(event);
-  console.log(event.file_id);
+  // console.log('event==>:');
+  // console.log(event);
+  // console.log(event.file_id);
   console.log('body==>:');
   console.log(body);
-  let url = 'https://slack.com/api/files.info?file=' + event.file_id +'&token=' + process.env.SLACK_BOT_TOKEN;
+
+  let url = 'https://slack.com/api/files.info?file=' + event.file_id +'&token=' + process.env.SLACK_AUTH_TOKEN;
   console.log(url);
-  superagent.get(url).then( data => {
-        console.log(data.body);
-        console.log('data.body.content------------>');
+  superagent.get(url)
+    .then( data => {
+        // console.log(data.body);
+        // console.log('data.body.content------------>');
         // console.log(data.body.title);
-        console.log(data.body.content);
+        // console.log(data.body.content);
+        console.log('channels----------------------------------------------->',data.body.channels);
+        return data.body.channel;
         // console.log(data.body.timestamp);
         //let gist_id_url = call_gist(),
         //mongodb.save(,title, name,   , , , ,, , )  
@@ -119,6 +144,7 @@ function handle_file_event(event, body){
 }
 
 slackEvents.on('file_created', handle_file_event);
+slackEvents.on('file_shared', handle_file_event);
 slackEvents.on('file_change', handle_file_event);
 
 
@@ -136,15 +162,15 @@ slackEvents.on('reaction_added', (event, body) => {
 });
 
 // *** Handle errors ***
-slackEvents.on('error', (error) => {
-  if (error.code === slackEventsApi.errorCodes.TOKEN_VERIFICATION_FAILURE) {
-    // This error type also has a `body` propery containing the request body which failed verification.
-    console.error(`An unverified request was sent to the Slack events Request URL. Request body: \
-${JSON.stringify(error.body)}`);
-  } else {
-    console.error(`An error occurred while handling a Slack event: ${error.message}`);
-  }
-});
+// slackEvents.on('error', (error) => {
+//   if (error.code === slackEventsApi.errorCodes.TOKEN_VERIFICATION_FAILURE) {
+//     // This error type also has a `body` propery containing the request body which failed verification.
+//     console.error(`An unverified request was sent to the Slack events Request URL. Request body: \
+// ${JSON.stringify(error.body)}`);
+//   } else {
+//     console.error(`An error occurred while handling a Slack event: ${error.message}`);
+//   }
+// });
 
 app.post('/slack/slash-commands/send-me-buttons', urlencodedParser, (req, res) =>{
   console.log('send-me-buttons-----------');
