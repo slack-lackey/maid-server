@@ -636,6 +636,443 @@ slackEvents.on('message', (message, body) => {
   }
 });
 
+// *** Greeting any user that says "help" ***
+slackEvents.on('message', (message, body) => {
+  // Only deal with messages that have no subtype (plain messages) and contain 'success'
+  if (!message.subtype && message.text.indexOf('help') >= 0) {
+    console.log('backtick message:', message);
+    // Initialize a client
+    const slack = getClientByTeamId(body.team_id);
+    // Handle initialization failure
+    if (!slack) {
+      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+    }
+    // Respond to the message back in the same channel
+    slack.chat.postMessage({ channel: message.channel, blocks:
+      [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Hi USERNAME! My name is Slack Lackey and I am ready and waiting to share your favorite code snippets with the world,* (_or at least the portion of the world with a GitHub_) *by saving them as Gists in a shared GitHub account.*',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/jkFJzPt.png',
+            'alt_text': 'slack lackey',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*HERE\'S WHAT I CAN DO...*',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you call me with *@Slack Lackey help* - I will show this message :sunglasses:.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you share a portion of code wrapped in ``` I will ask you if you want to save it as a Gist.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you create a code snippet by clicking the :heavy_plus_sign: to the left of the message input box, I will ask if you want to save it as a Gist.\n\n *Reminder: * _Don\'t forget to give your code snippet a Title and a Type. If you forget, I can still do my work but you may have a harder time querying your snippet later._\n\n If you say you want to save your snippet as a Gist, I will ask you a few more questions',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'fields': [
+            {
+              'type': 'mrkdwn',
+              'text': '*Title*',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': 'Descriptive file name',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': '*Author*',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': 'Who wrote the snippet?',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': '*Data Structures*',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': 'A list of common data structures',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': '*Code Tools*',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': 'Tips and tricks for common code tools',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': '*Other Random Topics*',
+            },
+            {
+              'type': 'mrkdwn',
+              'text': 'When your snippet defies categorization',
+            },
+          ],
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Note:* You can choose 0 to 1 option per drop down menu.\n\n',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Need additonal keywords?:* Ask my creators to add them for you!',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'Click *"Save as a Gist!"*\n\nI will do all of the work for you and send you back a message with your new Gist url and a button you can use to go visit it on GitHub.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you feel like sharing, you can also share your new Gist with your channel!\n\nAll you have to do is click *"Share to Channel"*',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you call me with *@Slack Lackey get all gists*, I will go get a list of all of the Gists in the GitHub linked to this channel.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you call me with *@Slack Lackey get [keyword] gists*, I will bring back a list of Gists with that keyword.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Notes:* \nAll keywords must be lowercase. \n_*Example:* mongo || linked list || css tricks_\n\nYou can search for partial keywords.\n_*Example:* css || hash || list_',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you call me with *@Slack Lackey get my gists*, I will bring back a list of Gists that you have previously created.', 
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you call me with *@Slack Lackey get gists from [mm/dd/yy]*, I will bring back a list of Gists that were created on that date.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'If you call me with *@Slack Lackey get gists from [mm/dd/yy] and [mm/dd/yy]*, I will bring back a list of Gists that were created inclusive of and between those dates.',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*It has been nice to meet you! Learn more about my family by clicking the button below...*',
+          },
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'button',
+              'text': {
+                'type': 'plain_text',
+                'text': 'My Creators',
+                'emoji': true,
+              },
+              'value': 'click_me_123',
+            },
+          ],
+        },
+      ] })
+      .catch(console.error);
+  }
+});
+
+// *** Greeting any user that says "family" ***
+slackEvents.on('message', (message, body) => {
+  // Only deal with messages that have no subtype (plain messages) and contain 'success'
+  if (!message.subtype && message.text.indexOf('family') >= 0) {
+    console.log('backtick message:', message);
+    // Initialize a client
+    const slack = getClientByTeamId(body.team_id);
+    // Handle initialization failure
+    if (!slack) {
+      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+    }
+    // Respond to the message back in the same channel
+    slack.chat.postMessage({ channel: message.channel, blocks:
+      [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': ' ',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'Hello USERNAME, I am so happy you wanted to meet my family!! \n\nThey are all amazing developers with a desire to make useful coding tools for people like you!',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/jkFJzPt.png',
+            'alt_text': 'Slack Lackey',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*SLACK LACKEY DEVELOPMENT TEAM*',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Billy Bunn:* Just say anything, George, say what ever\'s natural, the first thing that comes to your mind. Take that you mutated son-of-a-bitch. My pine, why you. You space bastard, you killed a pine. You do? Yeah, it\'s 8:00. Hey, McFly, I thought I told you never to come in here.',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/RYWTdGh.png',
+            'alt_text': 'billy bot',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Christ Merritt:* Gangplank draft to go on account gangway Sail ho square-rigged ahoy bilge water spike pink. Lanyard Sea Legs to go on account marooned grog bring a spring upon her cable interloper careen boatswain fluke.',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/g7dNuxz.png',
+            'alt_text': 'chris bot',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Erin Trainor:* Pastry tiramisu candy. Powder cake apple pie pie cupcake. Ice cream fruitcake chocolate cake topping. Candy marshmallow oat cake chupa chups muffin sweet macaroon sesame snaps powder. Muffin apple pie toffee chocolate pastry gingerbread soufflé topping.',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/6DDsiQ5.png',
+            'alt_text': 'erin bot',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Vanessa Wei:* Let your imagination be your guide. Let\'s do that again. It\'s all a game of angles. How to paint. That\'s easy. What to paint. That\'s much harder. Maybe he has a little friend that lives right over here. You better get your coat out, this is going to be a cold painting.',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/0BA3fOC.png',
+            'alt_text': 'vanessa bot',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*SLACK LACKEY SUPPORT STAFF*',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*John Cokos:* I\'m a chef, a developer, a helluva manager and motivator, and although nobody will give it to me, I\'m taking full credit for turning the Internet upside down about 20 years ago ... taking some huge risks and making some equally huge impacts.',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/QqY5Nok.png',
+            'alt_text': 'john bot',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Ix Procopios:* Born and raised in Washington State, I truly believe that feedback is a gift. As Angela Duckworth said, “Perseverance is the daily discipline of trying to do things better than we did yesterday.”',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/Vfj8MYY.png',
+            'alt_text': 'ix bot',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Hannah Ingham:* JavaScript developer motivated to use technology as a way to connect people, empower consumers, and boost community engagement.',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/cqMzpmZ.png',
+            'alt_text': 'hannah bot',
+          },
+        },
+      ] })
+      .catch(console.error);
+  }
+});
+
+
 // *** Responding to reactions with the same emoji ***
 slackEvents.on('reaction_added', (event, body) => {
   // Initialize a client
