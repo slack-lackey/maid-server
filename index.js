@@ -101,6 +101,127 @@ slackEvents.on('file_created', (message, body) => {
   }
 });
 
+// // *** Greeting any user that says "```" ***
+// slackEvents.on('message', (message, body) => {
+//   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
+//   if (!message.subtype && message.text.indexOf('```') >= 0) {
+//     console.log('backtick message:', message);
+//     // Initialize a client
+//     const slack = getClientByTeamId(body.team_id);
+//     // Handle initialization failure
+//     if (!slack) {
+//       return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+//     }
+//     // Respond to the message back in the same channel
+//     slack.chat.postMessage({ channel: message.channel, blocks: [
+//       {
+//         'type': 'section',
+//         'text': {
+//           'type': 'mrkdwn',
+//           'text': 'I saw that you posted a code snippet!\n\n*Do you want to save it as a Gist on GitHub?*',
+//         },
+//       },
+//       {
+//         'type': 'actions',
+//         'elements': [
+//           {
+//             'type': 'button',
+//             'text': {
+//               'type': 'plain_text',
+//               'emoji': true,
+//               'text': 'Yes',
+//             },
+//             'value': 'click_me_123',
+//             'style': 'primary',
+//           },
+//           {
+//             'type': 'button',
+//             'text': {
+//               'type': 'plain_text',
+//               'emoji': true,
+//               'text': 'No',
+//             },
+//             'value': 'click_me_123',
+//             'style': 'danger',
+//           },
+//         ],
+//       },
+//       {
+//         'type': 'divider',
+//       },
+//       {
+//         'type': 'section',
+//         'text': {
+//           'type': 'mrkdwn',
+//           'text': '*Here is the information I will save for you...*',
+//         },
+//       },
+//       {
+//         'type': 'section',
+//         'text': {
+//           'type': 'mrkdwn',
+//           'text': '*File name:*\nmy-amazing-gist\n\n*Author:*\n',
+//         },
+//       },
+//       {
+//         'type': 'actions',
+//         'elements': [
+//           {
+//             'type': 'users_select',
+//             'placeholder': {
+//               'type': 'plain_text',
+//               'text': 'Select a user',
+//               'emoji': true,
+//             },
+//           },
+//         ],
+//       },
+//       {
+//         'type': 'section',
+//         'text': {
+//           'type': 'mrkdwn',
+//           'text': '*Choose a category*',
+//         },
+//         'accessory': {
+//           'type': 'static_select',
+//           'placeholder': {
+//             'type': 'plain_text',
+//             'text': 'Select a category',
+//             'emoji': true,
+//           },
+//           'options': [
+//             {
+//               'text': {
+//                 'type': 'plain_text',
+//                 'text': 'Data Structures',
+//                 'emoji': true,
+//               },
+//               'value': 'value-0',
+//             },
+//             {
+//               'text': {
+//                 'type': 'plain_text',
+//                 'text': 'Login Instructions',
+//                 'emoji': true,
+//               },
+//               'value': 'value-1',
+//             },
+//             {
+//               'text': {
+//                 'type': 'plain_text',
+//                 'text': 'Random Stuff',
+//                 'emoji': true,
+//               },
+//               'value': 'value-2',
+//             },
+//           ],
+//         },
+//       },
+//     ] })
+//       .catch(console.error);
+//   }
+// });
+
 // *** Greeting any user that says "```" ***
 slackEvents.on('message', (message, body) => {
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
@@ -113,111 +234,404 @@ slackEvents.on('message', (message, body) => {
       return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
     }
     // Respond to the message back in the same channel
-    slack.chat.postMessage({ channel: message.channel, blocks: [
-      {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': 'I saw that you posted a code snippet!\n\n*Do you want to save it as a Gist on GitHub?*',
-        },
-      },
-      {
-        'type': 'actions',
-        'elements': [
-          {
-            'type': 'button',
-            'text': {
-              'type': 'plain_text',
-              'emoji': true,
-              'text': 'Yes',
-            },
-            'value': 'click_me_123',
-            'style': 'primary',
+    slack.chat.postMessage({ channel: message.channel, blocks:
+      [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'I saw that you shared a code snippet!\n\n*Do you want to save it as a Gist on GitHub?*\n\n*Reminder:* _Did you give your code snippet a "Title"? If not you can go add one by clicking the :pencil2: to the right of your snippet message and editing the file_',
           },
-          {
-            'type': 'button',
-            'text': {
-              'type': 'plain_text',
-              'emoji': true,
-              'text': 'No',
-            },
-            'value': 'click_me_123',
-            'style': 'danger',
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/jkFJzPt.png',
+            'alt_text': 'palm tree',
           },
-        ],
-      },
-      {
-        'type': 'divider',
-      },
-      {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': '*Here is the information I will save for you...*',
         },
-      },
-      {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': '*File name:*\nmy-amazing-gist\n\n*Author:*\n',
-        },
-      },
-      {
-        'type': 'actions',
-        'elements': [
-          {
-            'type': 'users_select',
-            'placeholder': {
-              'type': 'plain_text',
-              'text': 'Select a user',
-              'emoji': true,
-            },
-          },
-        ],
-      },
-      {
-        'type': 'section',
-        'text': {
-          'type': 'mrkdwn',
-          'text': '*Choose a category*',
-        },
-        'accessory': {
-          'type': 'static_select',
-          'placeholder': {
-            'type': 'plain_text',
-            'text': 'Select a category',
-            'emoji': true,
-          },
-          'options': [
+        {
+          'type': 'actions',
+          'elements': [
             {
+              'type': 'button',
               'text': {
+                'type': 'plain_text',
+                'text': 'Yes',
+                'emoji': true,
+              },
+              'value': 'click_me_123',
+              'style': 'primary',
+            },
+            {
+              'type': 'button',
+              'text': {
+                'type': 'plain_text',
+                'text': 'No',
+                'emoji': true,
+              },
+              'value': 'click_me_124',
+              'style': 'danger',
+            },
+          ],
+        },
+      ] })
+      .catch(console.error);
+  }
+});
+
+// *** Greeting any user that says "save" ***
+slackEvents.on('message', (message, body) => {
+  // Only deal with messages that have no subtype (plain messages) and contain 'save'
+  if (!message.subtype && message.text.indexOf('save') >= 0) {
+    console.log('backtick message:', message);
+    // Initialize a client
+    const slack = getClientByTeamId(body.team_id);
+    // Handle initialization failure
+    if (!slack) {
+      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+    }
+    // Respond to the message back in the same channel
+    slack.chat.postMessage({ channel: message.channel, blocks:
+      [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': 'I am so excited that you want save your code snippet as a Gist!!\n\n\n*Reminder:* _If you don\'t like what you see below you can go edit your snippet and I will ask again after you save :grin:_\n\n\n*This is what I will save for you:*',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/jkFJzPt.png',
+            'alt_text': 'slack lackey',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Title:*\n\n FAKE-TITLE-HERE',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Author:*',
+          },
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'users_select',
+              'placeholder': {
+                'type': 'plain_text',
+                'text': 'Select a User',
+                'emoji': true,
+              },
+            },
+          ],
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Subject Keywords:*',
+          },
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'static_select',
+              'placeholder': {
                 'type': 'plain_text',
                 'text': 'Data Structures',
                 'emoji': true,
               },
-              'value': 'value-0',
+              'options': [
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Array Methods',
+                    'emoji': true,
+                  },
+                  'value': 'value-0',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Linked Lists',
+                    'emoji': true,
+                  },
+                  'value': 'value-1',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Stacks',
+                    'emoji': true,
+                  },
+                  'value': 'value-2',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Queues',
+                    'emoji': true,
+                  },
+                  'value': 'value-3',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Binary Trees',
+                    'emoji': true,
+                  },
+                  'value': 'value-4',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Hash Tables',
+                    'emoji': true,
+                  },
+                  'value': 'value-5',
+                },
+              ],
             },
             {
-              'text': {
+              'type': 'static_select',
+              'placeholder': {
                 'type': 'plain_text',
-                'text': 'Login Instructions',
+                'text': 'Code Tools',
                 'emoji': true,
               },
-              'value': 'value-1',
+              'options': [
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Mongo',
+                    'emoji': true,
+                  },
+                  'value': 'value-0',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'React',
+                    'emoji': true,
+                  },
+                  'value': 'value-1',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'PSQL',
+                    'emoji': true,
+                  },
+                  'value': 'value-2',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'AWS',
+                    'emoji': true,
+                  },
+                  'value': 'value-3',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Azure',
+                    'emoji': true,
+                  },
+                  'value': 'value-4',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Heroku',
+                    'emoji': true,
+                  },
+                  'value': 'value-5',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'JSDOCS',
+                    'emoji': true,
+                  },
+                  'value': 'value-6',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Swagger',
+                    'emoji': true,
+                  },
+                  'value': 'value-7',
+                },
+              ],
             },
             {
-              'text': {
+              'type': 'static_select',
+              'placeholder': {
                 'type': 'plain_text',
-                'text': 'Random Stuff',
+                'text': 'Other Random Topics',
                 'emoji': true,
               },
-              'value': 'value-2',
+              'options': [
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Useful Terminal Commands',
+                    'emoji': true,
+                  },
+                  'value': 'value-0',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'ASCII Art',
+                    'emoji': true,
+                  },
+                  'value': 'value-1',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'CSS Tricks',
+                    'emoji': true,
+                  },
+                  'value': 'value-2',
+                },
+                {
+                  'text': {
+                    'type': 'plain_text',
+                    'text': 'Too Random to Categorize',
+                    'emoji': true,
+                  },
+                  'value': 'value-2',
+                },
+              ],
             },
           ],
         },
-      },
-    ] })
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*Link to Snippet:*',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '<https://slacklackey.slack.com/files/UHVUXRV2B/FHY6E36NL/title_to_snippet.pl/edit>',
+          },
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'button',
+              'text': {
+                'type': 'plain_text',
+                'text': 'Save as a Gist!',
+                'emoji': true,
+              },
+              'value': 'click_me_123',
+            },
+          ],
+        },
+      ] })
+      .catch(console.error);
+  }
+});
+
+// *** Greeting any user that says "success" ***
+slackEvents.on('message', (message, body) => {
+  // Only deal with messages that have no subtype (plain messages) and contain 'success'
+  if (!message.subtype && message.text.indexOf('success') >= 0) {
+    console.log('backtick message:', message);
+    // Initialize a client
+    const slack = getClientByTeamId(body.team_id);
+    // Handle initialization failure
+    if (!slack) {
+      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
+    }
+    // Respond to the message back in the same channel
+    slack.chat.postMessage({ channel: message.channel, blocks:
+      [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*I saved your Gist!*\n\nHere is your URL if you want to share it with others.\n\n<https://media.giphy.com/media/zaqclXyLz3Uoo/giphy.gif>\n\n',
+          },
+          'accessory': {
+            'type': 'image',
+            'image_url': 'https://i.imgur.com/jkFJzPt.png',
+            'alt_text': 'slack lackey',
+          },
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'button',
+              'text': {
+                'type': 'plain_text',
+                'text': 'See Your Gist on GitHub',
+                'emoji': true,
+              },
+              'value': 'click_me_123',
+            },
+          ],
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'image',
+          'title': {
+            'type': 'plain_text',
+            'text': 'Success',
+            'emoji': true,
+          },
+          'image_url': 'https://media.giphy.com/media/skmziDEEjiin6/giphy.gif',
+          'alt_text': 'Success GIF',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'plain_text',
+            'text': ' ',
+            'emoji': true,
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'button',
+              'text': {
+                'type': 'plain_text',
+                'text': 'Share to Channel',
+                'emoji': true,
+              },
+              'value': 'click_me_123',
+            },
+          ],
+        },
+      ] })
       .catch(console.error);
   }
 });
