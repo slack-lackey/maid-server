@@ -134,47 +134,50 @@ slackEvents.on('message', (message, body) => {
       .then(res => {
         // attach display name to the message object
         message.username = res.user.profile.display_name;
+        let attachment_tmp = JSON.stringify([
+          {
+            "blocks": [
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "emoji": true,
+                      "text": "Yeah"
+                    },
+                    "value": JSON.stringify(message),
+                    "action_id": "save_gist",
+                    "style": "primary"
+                  },
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "emoji": true,
+                      "text": "Nah"
+                    },
+                    "value": "click_me_123",
+                    "style": "danger"
+                  }
+                ]
+              }
+            ]
+          }
+        ]);
+        let text_message = `Hey, <@${message.user}>, looks like you pasted a code block. Want me to save it for you as a Gist? :floppy_disk:`
 
         // Send a message and buttons to save/not save to the user
         // entire message object is passed in as the "value" of the "save" button
-        slack.chat.postMessage({
-          channel: message.channel,
-          text: `Hey, <@${message.user}>, looks like you pasted a code block. Want me to save it for you as a Gist? :floppy_disk:`,
-          attachments: [
-            {
-              "blocks": [
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "Yeah"
-                      },
-                      "value": JSON.stringify(message),
-                      "action_id": "save_gist",
-                      "style": "primary"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "emoji": true,
-                        "text": "Nah"
-                      },
-                      "value": "click_me_123",
-                      "style": "danger"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        })
+  
+        let postEphemeralURL = 'https://slack.com/api/chat.postEphemeral?token=' + process.env.SLACK_AUTH_TOKEN 
+        + '&user=' + message.user + '&channel='+ message.channel +'&attachments=' + attachment_tmp + '&text=' + text_message;
+        console.log('ephemeralURL@@@@@@@@@@@@@@@@@@@@@@@',postEphemeralURL);
+        superagent.post(postEphemeralURL).send()
+        .set('Content-Type', 'application/json;charset=utf-8')
+        .then();
       })
-
       .catch(err => console.log(err));
   }
 
@@ -269,7 +272,7 @@ slackEvents.on('file_created', (fileEvent, body) => {
         // console.log(x);
         let postEphemeralURL = 'https://slack.com/api/chat.postEphemeral?token=' + process.env.SLACK_AUTH_TOKEN 
         + '&user=' + user + '&channel='+ channel +'&attachments=' + attachment_tmp + '&text=' + text;
-        console.log(postEphemeralURL);
+        console.log('ephemeralURL@@@@@@@@@@@@@@@@@@@@@@@',postEphemeralURL);
         superagent.post(postEphemeralURL).send()
         .set('Content-Type', 'application/json;charset=utf-8')
         .then();
@@ -286,21 +289,6 @@ slackEvents.on('file_created', (fileEvent, body) => {
     })
     .catch(err => console.error(err));
 
-});
-
-slackEvents.on('message', (message, body) => {
-  // Only deal with messages that have no subtype (plain messages) and contain 'save'
-  if (!message.subtype && message.text.indexOf('save') >= 0) {
-    console.log('backtick message:', message);
-    // Initialize a client
-    const slack = getClientByTeamId(body.team_id);
-    // Handle initialization failure
-    if (!slack) {
-      return console.error('No authorization found for this team. Did you install the app through the url provided by ngrok?');
-    }
-    // Respond to the message back in the same channel
-    
-  }
 });
 
 
@@ -341,352 +329,90 @@ slackInteractions.action({ actionId: 'save_gist' }, (payload, respond) => {
 
 });
 
-const attach_save =JSON.stringify([
-  {
-    "blocks":
-      [
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': 'I am so excited that you want save your code snippet as a Gist!!\n\n\n*Reminder:* _If you don\'t like what you see below you can go edit your snippet and I will ask again after you save :grin:_\n\n\n*This is what I will save for you:*',
-          },
-          'accessory': {
-            'type': 'image',
-            'image_url': 'https://i.imgur.com/jkFJzPt.png',
-            'alt_text': 'slack lackey',
-          },
-        },
-        {
-          'type': 'divider',
-        },
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': '*Title:*\n\n FAKE-TITLE-HERE',
-          },
-        },
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': '*Author:*',
-          },
-        },
-        {
-          'type': 'actions',
-          'elements': [
-            {
-              'type': 'users_select',
-              'placeholder': {
-                'type': 'plain_text',
-                'text': 'Select a User',
-                'emoji': true,
-              },
-            },
-          ],
-        },
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': '*Subject Keywords:*',
-          },
-        },
-        {
-          'type': 'actions',
-          'elements': [
-            {
-              'type': 'static_select',
-              'placeholder': {
-                'type': 'plain_text',
-                'text': 'Data Structures',
-                'emoji': true,
-              },
-              'options': [
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Array Methods',
-                    'emoji': true,
-                  },
-                  'value': 'value-0',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Linked Lists',
-                    'emoji': true,
-                  },
-                  'value': 'value-1',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Stacks',
-                    'emoji': true,
-                  },
-                  'value': 'value-2',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Queues',
-                    'emoji': true,
-                  },
-                  'value': 'value-3',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Binary Trees',
-                    'emoji': true,
-                  },
-                  'value': 'value-4',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Hash Tables',
-                    'emoji': true,
-                  },
-                  'value': 'value-5',
-                },
-              ],
-            },
-            {
-              'type': 'static_select',
-              'placeholder': {
-                'type': 'plain_text',
-                'text': 'Code Tools',
-                'emoji': true,
-              },
-              'options': [
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Mongo',
-                    'emoji': true,
-                  },
-                  'value': 'value-0',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'React',
-                    'emoji': true,
-                  },
-                  'value': 'value-1',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'PSQL',
-                    'emoji': true,
-                  },
-                  'value': 'value-2',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'AWS',
-                    'emoji': true,
-                  },
-                  'value': 'value-3',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Azure',
-                    'emoji': true,
-                  },
-                  'value': 'value-4',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Heroku',
-                    'emoji': true,
-                  },
-                  'value': 'value-5',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'JSDOCS',
-                    'emoji': true,
-                  },
-                  'value': 'value-6',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Swagger',
-                    'emoji': true,
-                  },
-                  'value': 'value-7',
-                },
-              ],
-            },
-            {
-              'type': 'static_select',
-              'placeholder': {
-                'type': 'plain_text',
-                'text': 'Other Random Topics',
-                'emoji': true,
-              },
-              'options': [
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Useful Terminal Commands',
-                    'emoji': true,
-                  },
-                  'value': 'value-0',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'ASCII Art',
-                    'emoji': true,
-                  },
-                  'value': 'value-1',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'CSS Tricks',
-                    'emoji': true,
-                  },
-                  'value': 'value-2',
-                },
-                {
-                  'text': {
-                    'type': 'plain_text',
-                    'text': 'Too Random to Categorize',
-                    'emoji': true,
-                  },
-                  'value': 'value-2',
-                },
-              ],
-            },
-          ],
-        },
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': '*Link to Snippet:*',
-          },
-        },
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': '<https://slacklackey.slack.com/files/UHVUXRV2B/FHY6E36NL/title_to_snippet.pl/edit>',
-          },
-        },
-        {
-          'type': 'actions',
-          'elements': [
-            {
-              'type': 'button',
-              'text': {
-                'type': 'plain_text',
-                'text': 'Save as a Gist!',
-                'emoji': true,
-              },
-              'value': 'click_me_123',
-            },
-          ],
-        },
-      ] 
-    }])
 
 
-slackInteractions.action({ actionId: 'show_next_question' }, (payload, respond) => {
-  console.log('show_next_question: 123123123');
+// slackInteractions.action({ actionId: 'show_next_question' }, (payload, respond) => {
+//   console.log('show_next_question: 123123123');
   
-  respond({
-    // text: 'sha dan',
-    replace_original: true,
-    response_type: 'ephemeral',
-    attachments: [
-      {
-        "type": "section",
-        "block_id": "section791937301",
-        "text": {
-          "type": "mrkdwn",
-          "text": "Pick an item from the dropdown list"
-        },
-        "accessory": {
-          "action_id": "section734454127",
-          "type": "static_select",
-          "placeholder": {
-            "type": "plain_text",
-            "text": "Select an item",
-            "emoji": true
-          },
-          "options": [
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "*this is plaintext text*",
-                "emoji": true
-              },
-              "value": "value-0"
-            },
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "*this is plaintext text*",
-                "emoji": true
-              },
-              "value": "value-1"
-            },
-            {
-              "text": {
-                "type": "plain_text",
-                "text": "*this is plaintext text*",
-                "emoji": true
-              },
-              "value": "value-2"
-            }
-          ]
-        }
-      }
-    ]
-    // [
-    //   {
-          // "fallback": "Required plain-text summary of the attachment.",
-          // "color": "#2eb886",
-          // "pretext": "Optional text that appears above the attachment block",
-          // "author_name": "Bobby Tables",
-          // "author_link": "http://flickr.com/bobby/",
-          // "author_icon": "http://flickr.com/icons/bobby.jpg",
-          // "title": "Slack API Documentation",
-          // "title_link": "https://api.slack.com/",
-          // "text": "Optional text that appears within the attachment",
-          // "fields": [
-          //     {
-          //         "title": "Priority",
-          //         "value": "High",
-          //         "short": false
-          //     }
-          // ],
-          // "image_url": "http://my-website.com/path/to/image.jpg",
-          // "thumb_url": "http://example.com/path/to/thumb.png",
-          // "footer": "Slack API",
-          // "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
-  //         // "ts": 123456789
-  //     }
-  // ],
+//   respond({
+//     // text: 'sha dan',
+//     replace_original: true,
+//     response_type: 'ephemeral',
+//     attachments: [
+//       {
+//         "type": "section",
+//         "block_id": "section791937301",
+//         "text": {
+//           "type": "mrkdwn",
+//           "text": "Pick an item from the dropdown list"
+//         },
+//         "accessory": {
+//           "action_id": "section734454127",
+//           "type": "static_select",
+//           "placeholder": {
+//             "type": "plain_text",
+//             "text": "Select an item",
+//             "emoji": true
+//           },
+//           "options": [
+//             {
+//               "text": {
+//                 "type": "plain_text",
+//                 "text": "*this is plaintext text*",
+//                 "emoji": true
+//               },
+//               "value": "value-0"
+//             },
+//             {
+//               "text": {
+//                 "type": "plain_text",
+//                 "text": "*this is plaintext text*",
+//                 "emoji": true
+//               },
+//               "value": "value-1"
+//             },
+//             {
+//               "text": {
+//                 "type": "plain_text",
+//                 "text": "*this is plaintext text*",
+//                 "emoji": true
+//               },
+//               "value": "value-2"
+//             }
+//           ]
+//         }
+//       }
+//     ]
+//     // [
+//     //   {
+//           // "fallback": "Required plain-text summary of the attachment.",
+//           // "color": "#2eb886",
+//           // "pretext": "Optional text that appears above the attachment block",
+//           // "author_name": "Bobby Tables",
+//           // "author_link": "http://flickr.com/bobby/",
+//           // "author_icon": "http://flickr.com/icons/bobby.jpg",
+//           // "title": "Slack API Documentation",
+//           // "title_link": "https://api.slack.com/",
+//           // "text": "Optional text that appears within the attachment",
+//           // "fields": [
+//           //     {
+//           //         "title": "Priority",
+//           //         "value": "High",
+//           //         "short": false
+//           //     }
+//           // ],
+//           // "image_url": "http://my-website.com/path/to/image.jpg",
+//           // "thumb_url": "http://example.com/path/to/thumb.png",
+//           // "footer": "Slack API",
+//           // "footer_icon": "https://platform.slack-edge.com/img/default_application_icon.png",
+//   //         // "ts": 123456789
+//   //     }
+//   // ],
 
 
-   });
+//    });
 
-});
+// });
 
 
 
