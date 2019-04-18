@@ -639,7 +639,7 @@ slackEvents.on('message', (message, body) => {
 // *** Greeting any user that says "help" ***
 slackEvents.on('message', (message, body) => {
   // Only deal with messages that have no subtype (plain messages) and contain 'success'
-  if (!message.subtype && message.text.indexOf('help') >= 0) {
+  if (!message.subtype && message.text.indexOf('info') >= 0) {
     console.log('backtick message:', message);
     // Initialize a client
     const slack = getClientByTeamId(body.team_id);
@@ -1104,3 +1104,13 @@ const port = process.env.PORT || 3000;
 http.createServer(app).listen(port, () => {
   console.log(`server listening on port ${port}`);
 });
+
+app.post('/slack/getgist', function(req,res) {
+  res.send('you asked me to get something');
+});
+
+app.post('/slack/getusergists', function(req,res) {
+  console.log('RESPONSE-----------------------------------------------------------', req.socket.server);
+  res.send('you asked me to get your stuff '+ `${req}`);
+});
+
